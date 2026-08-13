@@ -1,28 +1,17 @@
 import requests
 from bs4 import BeautifulSoup
-import re
 
-res = requests.get('https://www.lipsum.com/')
-soup = BeautifulSoup(res.content, 'html5lib') # If this line causes an error, run 'pip install html5lib' or install html5lib
-data = soup.find('div', id=re.compile(r"Panes"))
-print(soup.find("h1").text)
+url = "https://blog.python.org/blog/"
 
-question_list = []
-answer_list = []
-for row in data.find_all("div"):
-    question_header = row.h2
-    question_list.append(question_header.text)
-    answer_string = ""
-    parent_div_element = row.find_parent("div")
-    all_p_tag_list = parent_div_element.find_all("p")
-    for p_tag in all_p_tag_list:
-        answer_string = answer_string + p_tag.text + "\n"
-    answer_list.append(answer_string)
+response = requests.get(url)
+soup = BeautifulSoup(response.content, "html.parser")
 
-file = open("qn_and_answer.txt", "w")
-for i in range(len(question_list)):
-    file.write(question_list[i] + "\n" + answer_list[i] + "\n")
-file.close()
+posts = soup.find_all("article")
 
-print("The question and answer have been saved to qn_and_answer.txt file")
+for post in posts:
+    title = post.find("h3").get_text(strip=True)
+    link = post.find("a", href=True)
 
+    print("Title:", title)
+    print("URL:", link.get("href"))
+    print("-" * 50)
